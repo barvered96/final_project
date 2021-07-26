@@ -552,13 +552,13 @@ def perform_nested_cv(dataset):
         inner_kf = KFold(3)
         lrs = [0.001, 0.0001]
         eps = [0.9, 0.99]
-        for lr in lrs:
+        for lr in lrs: # Starting hyper parameter tuning
             optimizer.defaults['lr'] = lr
             for ep in eps:
                 optimizer.defaults['eps'] = ep
                 print("Starting HyperParameter tuning using lr", lr, "and epsilon", ep)
                 cv_inside = 1
-                for inner_train, rest_train in inner_kf.split(X_train['data']):
+                for inner_train, rest_train in inner_kf.split(X_train['data']): # Inside 10 cross validation
                     print("Starting inside cross validation number:", cv_inside)
                     cv_inside += 1
                     inner_training_x, inner_testing_x = {'data': X_train['data'][inner_train], 'mask': X_train['mask'][inner_train]}, {'data': X_train['data'][rest_train], 'mask': X_train['mask'][rest_train]}
@@ -688,7 +688,7 @@ def perform_nested_cv(dataset):
         acc_scores.append(best_test_accuracy)
         best_params.append({'lr': best_lr, 'ep': best_ep})
 
-
+    #Printing results to excel file
     infer_times = [time * 1000 / len(X_test) for time in infer_times]
     data = {
         "Dataset": [dataset, dataset, dataset, dataset, dataset, dataset, dataset, dataset, dataset, dataset],
