@@ -25,10 +25,10 @@ def perform_nested_cv(clf, X, Y, dataset, classes, params_grid=[]):
     acc_scores, roc_scores, tprs, fprs, precisions, auprs, best, train_times, infer_times = [], [], [], [], [], [], [], [], []
     counter_cv = 1
     X, Y = sm.fit_resample(X, Y)
-    for train, test in outer_kf.split(X, Y):
+    for train, test in outer_kf.split(X, Y): #start 10 cross validation
         X_train, X_test = X.iloc[train], X.iloc[test]
         Y_train, Y_test = Y.iloc[train], Y.iloc[test]
-        gs_cls.fit(X_train, Y_train)
+        gs_cls.fit(X_train, Y_train) #fit with 3 KFold hyper parameter tuning
         best_params = gs_cls.best_params_
         best.append(best_params)
         best_estimator = gs_cls.best_estimator_
@@ -42,7 +42,7 @@ def perform_nested_cv(clf, X, Y, dataset, classes, params_grid=[]):
         end_train_time = time.time() - train_time
         train_times.append(end_train_time)
         print("Validation.....")
-        infer_time = time.time()
+        infer_time = time.time() # Calculations for metrics
         Y_pred = best_estimator.predict(X_test)
         proba = best_estimator.predict_proba(X_test)
         end_infer_time = time.time() - infer_time
@@ -111,7 +111,7 @@ def perform_nested_cv(clf, X, Y, dataset, classes, params_grid=[]):
 
     return best_estimator
 
-
+#Parameters you might want to change for different datasets
 dataset_name = 'baseball'
 DATASET_PATH = f'C:/Users/barve/PycharmProjects/RFCompare/data/{dataset_name}.csv'
 dataset = pd.read_csv(DATASET_PATH)
