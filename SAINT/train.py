@@ -552,13 +552,13 @@ def perform_nested_cv(dataset):
         inner_kf = KFold(3)
         lrs = [0.001, 0.0001]
         eps = [0.9, 0.99]
-        for lr in lrs:
+        for lr in lrs: # hyper parameter tuning
             optimizer.defaults['lr'] = lr
             for ep in eps:
                 optimizer.defaults['eps'] = ep
                 print("Starting HyperParameter tuning using lr", lr, "and epsilon", ep)
                 cv_inside = 1
-                for inner_train, rest_train in inner_kf.split(X_train['data']):
+                for inner_train, rest_train in inner_kf.split(X_train['data']): # 10 CV starts here
                     print("Starting inside cross validation number:", cv_inside)
                     cv_inside += 1
                     inner_training_x, inner_testing_x = {'data': X_train['data'][inner_train], 'mask': X_train['mask'][inner_train]}, {'data': X_train['data'][rest_train], 'mask': X_train['mask'][rest_train]}
@@ -572,7 +572,7 @@ def perform_nested_cv(dataset):
                         model.train()
                         running_loss = 0.0
 
-                        for i, data in enumerate(trainloader, 0):
+                        for i, data in enumerate(trainloader, 0): # Training starts here
                             optimizer.zero_grad()
                             # x_categ is the the categorical data, with y appended as last feature. x_cont has continuous data. cat_mask is an array of ones same shape as x_categ except for last column(corresponding to y's) set to 0s. con_mask is an array of ones same shape as x_cont.
                             x_categ, x_cont, cat_mask, con_mask = data[0].to(device), data[1].to(device),data[2].to(device),data[3].to(device)
@@ -593,7 +593,7 @@ def perform_nested_cv(dataset):
                             'loss': loss.item()
                             })
 
-                        if epoch == 9:
+                        if epoch == 9: # Inferring stage
                                 model.eval()
                                 with torch.no_grad():
                                     if opt.dataset in ['mnist','volkert']:
@@ -688,7 +688,7 @@ def perform_nested_cv(dataset):
         acc_scores.append(best_test_accuracy)
         best_params.append({'lr': best_lr, 'ep': best_ep})
 
-
+    #Printing metrics values to excel
     infer_times = [time * 1000 / len(X_test) for time in infer_times]
     data = {
         "Dataset": [dataset, dataset, dataset, dataset, dataset, dataset, dataset, dataset, dataset, dataset],
@@ -709,4 +709,4 @@ def perform_nested_cv(dataset):
 
 
 if __name__ == '__main__':
-    perform_nested_cv('1995_income')
+    perform_nested_cv('1995_income') # parameters you might want to change for different datasets
